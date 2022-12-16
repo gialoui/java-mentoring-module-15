@@ -31,7 +31,7 @@ SELECT
     arrays.lastnames[s.a % ARRAY_LENGTH(arrays.lastnames,1) + 1] AS surname,
     arrays.primarySkills[s.a % ARRAY_LENGTH(arrays.primarySkills,1) + 1],
 	timestamp '2014-01-10 20:00:00' + random() * (timestamp '1970-01-20 20:00:00' - timestamp '2000-01-10 10:00:00') AS dob
-FROM  generate_series(1,1000) AS s(a) -- number of names to generate
+FROM  generate_series(1,10000) AS s(a) -- number of names to generate
 CROSS JOIN(
     SELECT ARRAY[
     'Adam','Bill','Bob','Calvin','Donald','Dwight','Frank','Fred','George','Howard',
@@ -114,7 +114,7 @@ DO $$ <<generate_exam_result_block>>
 DECLARE
 	random_score smallint;
 BEGIN
-   	FOR iStudent in 1..1000 LOOP
+   	FOR iStudent in 1..10000 LOOP
 		FOR iSubject in 1..5 LOOP
 			select trunc(random() * 10 + 1) into random_score;			
 			INSERT INTO exam_result (student_id, subject_id, mark)

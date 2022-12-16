@@ -8,68 +8,62 @@ WHERE surname IS NULL OR LENGTH(surname) < 2;
 
 -- 3. Select number of students passed exams for each subject and order result by a number of student descending.
 SELECT s.name, COUNT(er.student_id) AS no_of_students
-FROM module_15.exam_result er INNER JOIN module_15.subject s ON er.subject_id = s.id
-WHERE er.mark >= 5
+FROM module_15.passed_mark er INNER JOIN module_15.subject s ON er.subject_id = s.id
 GROUP BY s.name
 ORDER BY COUNT(er.student_id) DESC;
 
 -- 4. Select number of students with the same exam marks for each subject.
 SELECT s.name, er.mark, COUNT(er.student_id) AS no_of_students
-FROM module_15.exam_result er INNER JOIN module_15.subject s ON er.subject_id = s.id
-WHERE er.mark >= 5
+FROM module_15.passed_mark er INNER JOIN module_15.subject s ON er.subject_id = s.id
 GROUP BY s.id, er.mark;
 
 -- 5. Select students who passed at least two exams for different subjects
 SELECT s.name, COUNT(DISTINCT er.subject_id) AS no_of_passed_subjects
-FROM module_15.exam_result er INNER JOIN module_15.student s ON er.student_id = s.id
-WHERE er.mark >= 5
+FROM module_15.passed_mark er INNER JOIN module_15.student s ON er.student_id = s.id
 GROUP BY s.id
 HAVING COUNT(er.subject_id) >= 2
 
 -- 6. Select students who passed at least two exams for the same subject.
 SELECT s.name, s.surname
-FROM module_15.exam_result er INNER JOIN module_15.student s ON er.student_id = s.id
-WHERE er.mark >= 5
+FROM module_15.passed_mark er INNER JOIN module_15.student s ON er.student_id = s.id
 GROUP BY s.id, er.subject_id
 HAVING COUNT(*) >= 2;
 
 -- 7. Select all subjects which exams passed only students with the same primary skills.
 -- It means that all students passed the exam for the one subject must have same primary skill
-SELECT *
+SELECT su."name" 
 FROM module_15.subject su
 WHERE su.id IN (SELECT er.subject_id
-	FROM module_15.exam_result er 
+	FROM module_15.passed_mark er 
 	INNER JOIN module_15.student st ON er.student_id = st.id
-	WHERE er.mark >= 5
 	GROUP BY er.subject_id
-	HAVING COUNT(DISTINCT st.primary_skill) = 1)
+	HAVING COUNT(DISTINCT st.primary_skill) = 1);
 
 -- 8. Select all subjects which exams passed only students with the different primary skills. 
 -- It means that all students passed the exam for the one subject must have different primary skill
-SELECT *
+SELECT su."name" 
 FROM module_15.subject su
 WHERE su.id IN (SELECT er.subject_id
-	FROM module_15.exam_result er 
+	FROM module_15.passed_mark er 
 	INNER JOIN module_15.student st ON er.student_id = st.id
-	WHERE er.mark >= 5
 	GROUP BY er.subject_id
-	HAVING COUNT(DISTINCT st.primary_skill) = COUNT(DISTINCT er.student_id))
+	HAVING COUNT(DISTINCT st.primary_skill) = COUNT(DISTINCT er.student_id));
 
 -- 9. Select students who does not pass any exam using each the following operator: 
 -- Outer join
 SELECT s.name, s.surname
-FROM module_15.student s LEFT OUTER JOIN module_15.exam_result er ON er.student_id = s.id AND er.mark >= 5
+FROM module_15.student s LEFT OUTER JOIN module_15.passed_mark er ON er.student_id = s.id
 WHERE er.mark IS NULL
 
 -- Subquery with ‘not in’ clause
 SELECT s.name, s.surname
 FROM module_15.student s
-WHERE s.id NOT IN (SELECT er.student_id FROM module_15.exam_result er WHERE er.mark >= 5)
+WHERE s.id NOT IN (SELECT er.student_id FROM module_15.passed_mark er)
 
 -- Subquery with ‘any‘ clause.
 SELECT s.name, s.surname
 FROM module_15.student s
-WHERE s.id != ALL (SELECT er.student_id FROM module_15.exam_result er WHERE er.mark >= 5)
+WHERE s.id != ALL (SELECT er.student_id FROM module_15.passed_mark er)
 
 -- Check which approach is faster for 1000, 10K, 100K exams and 10, 1K, 100K students
 -- The first approach is always the fastest as it doesn't need to retrieve data from exam_result every time
@@ -83,7 +77,7 @@ HAVING AVG(er.mark) > (SELECT AVG(mark) FROM module_15.exam_result);
 -- 11. Select top 5 students who passed their last exam better than average students.
 SELECT s.name, s.surname
 FROM module_15.student s INNER JOIN module_15.exam_result er ON er.student_id = s.id
-WHERE er.id IN (SELECT MAX(er.id) FROM module_15.exam_result er WHERE er.mark >= 5 GROUP BY er.student_id)
+WHERE er.id IN (SELECT MAX(er.id) FROM module_15.passed_mark er GROUP BY er.student_id)
 GROUP BY s.id
 HAVING AVG(er.mark) > (SELECT AVG(mark) FROM module_15.exam_result) 
 LIMIT 5;

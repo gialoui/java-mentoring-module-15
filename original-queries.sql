@@ -20,7 +20,7 @@ WHERE er.mark >= 5
 GROUP BY s.id, er.mark;
 
 -- 5. Select students who passed at least two exams for different subjects
-SELECT s.name, COUNT(er.subject_id) AS no_of_passed_subjects
+SELECT s.name, COUNT(DISTINCT er.subject_id) AS no_of_passed_subjects
 FROM module_15.exam_result er INNER JOIN module_15.student s ON er.student_id = s.id
 WHERE er.mark >= 5
 GROUP BY s.id
@@ -72,7 +72,7 @@ FROM module_15.student s
 WHERE s.id != ALL (SELECT er.student_id FROM module_15.exam_result er WHERE er.mark >= 5)
 
 -- Check which approach is faster for 1000, 10K, 100K exams and 10, 1K, 100K students
-
+-- The first approach is always the fastest as it doesn't need to retrieve data from exam_result every time
 
 -- 10. Select all students whose average mark is bigger than overall average mark.
 SELECT s.name, s.surname, AVG(er.mark) AS Average
@@ -90,7 +90,7 @@ LIMIT 5;
 
 -- 12. Select biggest mark for each student and add text description for the mark (use COALESCE and WHEN operators)
 -- In case if student has not passed any exam ‘not passed' should be returned.
-SELECT s.id, CASE 
+SELECT s.id, s."name", s.surname, CASE 
 		WHEN MAX(er.mark) >= 1 AND MAX(er.mark) <= 3 THEN 'BAD'
 		WHEN MAX(er.mark) > 3 AND MAX(er.mark) <= 6 THEN 'AVERAGE'
 		WHEN MAX(er.mark) > 6 AND MAX(er.mark) <= 8 THEN 'GOOD'

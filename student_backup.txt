@@ -1,0 +1,8 @@
+"id","name","surname","dob","primary_skill","created_datetime","updated_datetime"
+1,Kholie,Nguyen,,Java 8,,
+2,Aldrew,Bobiles,,Python-8,,
+3,Huy,,,Angular,,
+4,Huy,P,,React,,
+5,Tin,Nguyen,,React,,
+6,Jeffrey,Tizon,,Angular,,
+7,Sunny,Kim,,React,,
